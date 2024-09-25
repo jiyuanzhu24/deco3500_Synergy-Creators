@@ -44,7 +44,9 @@ app.post('/login', async (req, res) => {
     }
     // 生成 token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.send(`Logged in! Your token: ${token}`);
+
+    // 登录成功后重定向到 index3.html
+    res.redirect('/index3.html');
 });
 
 // 监听端口
