@@ -7,10 +7,12 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static('public')); // 托管 public 文件夹中的静态文件
 
 // 连接 MongoDB 数据库
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.log('MongoDB connection error:', err));
 
 // 创建用户模型
 const userSchema = new mongoose.Schema({
@@ -26,7 +28,7 @@ app.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
-    res.redirect('/login.html');
+    res.redirect('/login.html'); // 注册成功后重定向到登录页面
 });
 
 // 登录路由
