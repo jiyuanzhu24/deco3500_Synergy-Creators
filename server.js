@@ -36,17 +36,17 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     if (!user) {
-        return res.status(400).send('User not found');
+        return res.status(400).json({ success: false, message: 'User not found' });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-        return res.status(400).send('Incorrect password');
+        return res.status(400).json({ success: false, message: 'Incorrect password' });
     }
     // 生成 token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // 登录成功后重定向到 index3.html
-    res.redirect('/index3.html');
+    // 返回登录成功的 JSON 响应
+    res.json({ success: true, username: user.username });
 });
 
 // 监听端口

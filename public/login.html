@@ -14,3 +14,33 @@
     </form>
 </body>
 </html>
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // 阻止表单的默认提交行为
+    
+        // 获取表单中的用户名和密码
+        const username = document.querySelector('input[name="username"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+    
+        // 向服务器发送登录请求
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+    
+        const data = await response.json();
+    
+        if (data.success) {
+            // 如果登录成功，将用户名存储到 localStorage
+            localStorage.setItem('username', data.username);
+            // 跳转到 index3.html 页面
+            window.location.href = '/index3.html';
+        } else {
+            // 如果登录失败，显示错误信息
+            alert(data.message);
+        }
+    });
+    </script>

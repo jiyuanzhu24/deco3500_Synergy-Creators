@@ -573,5 +573,16 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 					}, 10000); // 10秒等待
 				});
 			</script>
+			<script>
+				document.addEventListener('DOMContentLoaded', function() {
+					// 从 localStorage 中获取用户名
+					const username = localStorage.getItem('username');
+					
+					// 如果用户名存在，显示在页面上
+					if (username) {
+						document.getElementById('logo').innerHTML = `<a href="#">${username}</a>`;
+					}
+				});
+				</script>
 	</body>
 </html>
