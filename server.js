@@ -52,3 +52,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');  // 假设你的 index.html 文件在 public 文件夹中
+});
