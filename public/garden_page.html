@@ -85,14 +85,14 @@
 
   <script>
     window.onload = () => {
-      const username = localStorage.getItem('username');
-      if (username) {
-        document.getElementById('usernameDisplay').innerText = `Welcome, ${username}`;
-      } else {
-        window.location.href = 'login.html';  // 如果没有登录，跳转到登录页面
-      }
+        const username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('logo').innerHTML = `<a href="#">${username}</a>`;
+        } else {
+            window.location.href = 'login.html';  // 如果用户未登录，跳转到登录页面
+        }
     };
-  </script>
+</script>
   <script>
     // 页面加载时获取用户名并显示
     window.onload = () => {
