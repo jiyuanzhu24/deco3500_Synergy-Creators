@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public')); // 托管 public 文件夹中的静态文件
 
 // 连接 MongoDB 数据库
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('MongoDB connection error:', err));
 
@@ -46,7 +46,7 @@ app.post('/login', async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // 返回登录成功的 JSON 响应
-    res.json({ success: true, username: user.username });
+    res.json({ success: true, username: user.username, token }); // 返回 token
 });
 
 // 监听端口
@@ -57,4 +57,50 @@ app.listen(PORT, () => {
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');  // 假设你的 index.html 文件在 public 文件夹中
+});
+
+// 创建评论模型
+const commentSchema = new mongoose.Schema({
+    username: String,
+    comment: String,
+    timestamp: { type: Date, default: Date.now }
+});
+const Comment = mongoose.model('Comment', commentSchema);
+
+// 评论提交路由 (确保用户已经登录)
+app.post('/submit-comment', async (req, res) => {
+    const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
+    
+    if (!token) {
+        return res.status(401).send('No token provided');
+    }
+
+    const { comment } = req.body;
+
+    // 验证用户 token
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return res.status(401).send('User not found');
+        }
+
+        // 创建并保存评论
+        const newComment = new Comment({
+            username: user.username,
+            comment
+        });
+        await newComment.save();
+
+        res.status(200).send('Comment submitted');
+    } catch (err) {
+        res.status(401).send('Invalid token');
+    }
+});
+
+// 获取所有评论的路由
+app.get('/comments', async (req, res) => {
+    const comments = await Comment.find().sort({ timestamp: -1 }); // 按时间倒序排列
+    res.json(comments);
 });

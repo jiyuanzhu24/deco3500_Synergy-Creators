@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Garden Photo</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body class="is-preload">
+
+    <!-- Header -->
+    <section id="header">
+      <header>
+        <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+        <h1 id="logo"><a href="#">Willis Corto</a></h1>
+        <p>I got reprogrammed by a rogue AI<br /> and now I'm totally cray</p>
+      </header>
+      <nav id="nav">
+        <ul>
+          <li><a href="#one" class="active">About</a></li>
+          <li><a href="#two">Things I Can Do</a></li>
+          <li><a href="#three">Collaborative garden design</a></li>
+          <li><a href="#four">Generate your garden</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <ul class="icons">
+          <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+          <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+          <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+          <li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+          <li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+        </ul>
+      </footer>
+    </section>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <!-- One -->
+        <section id="one">
+          <div class="container">
+            <header class="major">
+              <h2>Garden Photo</h2>
+              <p>Upload your garden photo and share your design.</p>
+            </header>
+
+            <!-- Pre-existing Garden Photo -->
+            <div class="photo-display">
+                <img src="images/garden_sample.jpg" alt="Garden Photo" style="max-width: 100%; height: auto;" />
+              </div>
+            </div>
+          </section>
+
+<!-- Comment Section -->
+<section id="comments">
+    <div class="container">
+      <h3>Comments</h3>
+      <div class="comment-box">
+        <textarea id="commentText" placeholder="Write your comment here..."></textarea>
+        <button type="submit" class="button primary" onclick="submitComment()">Submit Comment</button>
+      </div>
+      <div class="existing-comments">
+        <h4>Previous Comments</h4>
+        <ul id="commentList">
+          <!-- 评论列表将在这里动态加载 -->
+        </ul>
+      </div>
+    </div>
+  </section>
+      </div>
+    </div>
+    <!-- Footer -->
+    <section id="footer">
+        <div class="container">
+          <ul class="copyright">
+            <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+          </ul>
+        </div>
+      </section>
+  
+    </body>
+  </html>
+
+  <script>
+    window.onload = () => {
+      const username = localStorage.getItem('username');
+      if (username) {
+        document.getElementById('usernameDisplay').innerText = `Welcome, ${username}`;
+      } else {
+        window.location.href = 'login.html';  // 如果没有登录，跳转到登录页面
+      }
+    };
+  </script>
+  <script>
+    // 页面加载时获取用户名并显示
+    window.onload = () => {
+      const username = localStorage.getItem('username');
+      if (username) {
+        document.getElementById('logo').innerText = `Welcome, ${username}`;
+        loadComments(); // 加载所有评论
+      } else {
+        window.location.href = 'login.html';  // 如果没有登录，跳转到登录页面
+      }
+    };
+    
+    // 提交评论函数
+    function submitComment() {
+      const comment = document.getElementById('commentText').value;
+      const token = localStorage.getItem('token'); // 从 localStorage 获取用户的 JWT token
+      
+      if (comment.trim() === '') {
+        alert('Comment cannot be empty.');
+        return;
+      }
+    
+      fetch('/submit-comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // 发送 token 以验证用户
+        },
+        body: JSON.stringify({ comment })
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert('Comment submitted successfully');
+        document.getElementById('commentText').value = ''; // 清空评论输入框
+        loadComments(); // 提交后重新加载评论
+      })
+      .catch(error => console.error('Error:', error));
+    }
+    
+    // 加载评论函数
+    function loadComments() {
+      fetch('/comments')
+        .then(response => response.json())
+        .then(comments => {
+          const commentList = document.getElementById('commentList');
+          commentList.innerHTML = ''; // 清空当前显示的评论
+          comments.forEach(comment => {
+            const li = document.createElement('li');
+            li.innerText = `${comment.username}: ${comment.comment}`;
+            commentList.appendChild(li);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>
