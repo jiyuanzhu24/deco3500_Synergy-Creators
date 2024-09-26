@@ -85,26 +85,16 @@
 
   <script>
     window.onload = () => {
-        const username = localStorage.getItem('username');
-        if (username) {
-            document.getElementById('logo').innerHTML = `<a href="#">${username}</a>`;
-        } else {
-            window.location.href = 'login.html';  // 如果用户未登录，跳转到登录页面
-        }
-    };
-</script>
-  <script>
-    // 页面加载时获取用户名并显示
-    window.onload = () => {
       const username = localStorage.getItem('username');
       if (username) {
-        document.getElementById('logo').innerText = `Welcome, ${username}`;
+        // 显示用户名
+        document.getElementById('logo').innerHTML = `<a href="#">${username}</a>`;
         loadComments(); // 加载所有评论
       } else {
-        window.location.href = 'login.html';  // 如果没有登录，跳转到登录页面
+        window.location.href = 'login.html'; // 如果用户未登录，跳转到登录页面
       }
     };
-    
+  
     // 提交评论函数
     function submitComment() {
       const comment = document.getElementById('commentText').value;
@@ -114,7 +104,7 @@
         alert('Comment cannot be empty.');
         return;
       }
-    
+  
       fetch('/submit-comment', {
         method: 'POST',
         headers: {
@@ -131,7 +121,7 @@
       })
       .catch(error => console.error('Error:', error));
     }
-    
+  
     // 加载评论函数
     function loadComments() {
       fetch('/comments')
@@ -147,50 +137,5 @@
         })
         .catch(error => console.error('Error:', error));
     }
-    </script>
-    <script>
-        // 评论提交逻辑和加载评论
-        document.querySelector('.comment-box button').addEventListener('click', async function() {
-            const comment = document.querySelector('.comment-box textarea').value;
-            const token = localStorage.getItem('token'); // 从 localStorage 获取 token
-    
-            if (!token) {
-                alert('你需要登录才能评论');
-                return;
-            }
-    
-            // 发送评论并附带令牌进行身份验证
-            const response = await fetch('/submit-comment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ comment })
-            });
-    
-            if (response.ok) {
-                alert('评论提交成功！');
-                loadComments(); // 提交成功后重新加载评论
-            } else {
-                alert('提交评论失败');
-            }
-        });
-    
-        // 加载评论的函数
-        async function loadComments() {
-            const response = await fetch('/comments');
-            const comments = await response.json();
-    
-            const commentList = document.querySelector('.existing-comments ul');
-            commentList.innerHTML = ''; // 清空现有评论
-    
-            comments.forEach(comment => {
-                const li = document.createElement('li');
-                li.textContent = `${comment.username}: ${comment.comment}`;
-                commentList.appendChild(li);
-            });
-        }
-    
-        window.onload = loadComments; // 页面加载时显示所有评论
-    </script>
+  </script>
+  
