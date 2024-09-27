@@ -2,10 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const multer = require('multer'); // 用于处理文件上传
-const path = require('path');
 require('dotenv').config();
-
 
 const app = express();
 app.use(express.json());
@@ -24,26 +21,6 @@ const userSchema = new mongoose.Schema({
     password: String,
 });
 const User = mongoose.model('User', userSchema);
-
-// 创建图片上传模型
-const uploadSchema = new mongoose.Schema({
-    username: String,
-    subject: String,
-    imagePath: String,
-    timestamp: { type: Date, default: Date.now }
-});
-const Upload = mongoose.model('Upload', uploadSchema);
-
-// 设置 multer 存储配置
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/uploads'); // 上传的图片将存储在 public/uploads 文件夹中
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // 使用时间戳避免文件名冲突
-    }
-});
-const upload = multer({ storage });
 
 // 注册路由
 app.post('/register', async (req, res) => {
@@ -69,30 +46,26 @@ app.post('/login', async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // 返回登录成功的 JSON 响应
-    res.json({ success: true, username: user.username, token });
+    res.json({ success: true, username: user.username, token }); // 返回 token
 });
 
-// 上传图片路由
-app.post('/upload', upload.single('image'), async (req, res) => {
-    const { username, subject } = req.body;
-    const imagePath = `/uploads/${req.file.filename}`;
-
-    // 存储图片及信息到数据库
-    const newUpload = new Upload({
-        username,
-        subject,
-        imagePath
-    });
-    await newUpload.save();
-
-    res.json({ success: true, imagePath, subject, username });
+// 监听端口
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
 
-// 获取所有上传的图片及信息
-app.get('/uploads', async (req, res) => {
-    const uploads = await Upload.find().sort({ timestamp: -1 });
-    res.json(uploads);
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');  // 假设你的 index.html 文件在 public 文件夹中
 });
+
+// 创建评论模型
+const commentSchema = new mongoose.Schema({
+    username: String,
+    comment: String,
+    timestamp: { type: Date, default: Date.now }
+});
+const Comment = mongoose.model('Comment', commentSchema);
 
 // 评论提交路由 (确保用户已经登录)
 app.post('/submit-comment', async (req, res) => {
@@ -128,12 +101,6 @@ app.post('/submit-comment', async (req, res) => {
 
 // 获取所有评论的路由
 app.get('/comments', async (req, res) => {
-    const comments = await Comment.find().sort({ timestamp: -1 });
+    const comments = await Comment.find().sort({ timestamp: -1 }); // 按时间倒序排列
     res.json(comments);
-});
-
-// 监听端口
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
 });
