@@ -84,29 +84,17 @@
 								<div class="container">
 									<h3>Collaborative garden design</h3>
 									<p>Here, you can invite other users to help design your garden model (please click here to view your garden model). Alternatively, you can share your creativity by designing or providing suggestions for the garden models uploaded by others in the list below. Through collaboration and exchange, discover more inspiration and create a truly unique garden design!</p>
-									<div class="features">
+									<div class="features" id="uploaded-gardens">
+										<!-- 原有的内容保留 -->
 										<article>
-											<a href="garden_page.html" class="image"><img src="images/pic01.jpg" alt="" /></a>
-											<div class="inner">
-												<h4>Possibly broke spacetime</h4>
-												<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
-											</div>
+										  <a href="garden_page.html" class="image"><img src="images/pic01.jpg" alt="" /></a>
+										  <div class="inner">
+											<h4>Possibly broke spacetime</h4>
+											<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
+										  </div>
 										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic02.jpg" alt="" /></a>
-											<div class="inner">
-												<h4>Terraformed a small moon</h4>
-												<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
-											</div>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic03.jpg" alt="" /></a>
-											<div class="inner">
-												<h4>Snapped dark matter in the wild</h4>
-												<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer adipiscing ornare amet.</p>
-											</div>
-										</article>
-									</div>
+										<!-- 这里是动态插入内容的容器 -->
+									  </div>
 								</div>
 							</section>
 
@@ -490,98 +478,139 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 
 			</div>
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
-			<script>
-				const dropArea = document.getElementById('drop-area');
-				const fileInput = document.getElementById('fileInput');
-				const preview = document.getElementById('preview'); // 预览图片的元素
-				const uploadButton = document.getElementById('uploadButton');
-				const loadingIcon = document.getElementById('loading');
-				const uploadText = document.getElementById('upload-text'); // 提示文字的元素
-				const container = document.querySelector('#four'); // 选择你的页面内容容器
-				
-				// 点击区域时触发文件选择
-				dropArea.addEventListener('click', () => {
-					fileInput.click();
-				});
-			
-				// 当文件拖进来时高亮显示区域
-				dropArea.addEventListener('dragover', (event) => {
-					event.preventDefault();
-					dropArea.classList.add('hover');
-				});
-			
-				// 当文件离开拖放区域时移除高亮
-				dropArea.addEventListener('dragleave', () => {
-					dropArea.classList.remove('hover');
-				});
-			
-				// 处理文件放入事件，显示预览图片
-				dropArea.addEventListener('drop', (event) => {
-					event.preventDefault();
-					dropArea.classList.remove('hover');
-					const file = event.dataTransfer.files[0]; // 获取第一个文件
-					fileInput.files = event.dataTransfer.files; // 将文件分配给 input
-			
-					// 显示预览图片
-					if (file && file.type.startsWith('image/')) {
-						const reader = new FileReader();
-						reader.onload = function(e) {
-							preview.src = e.target.result;
-							preview.style.display = 'block'; // 显示图片预览
-							uploadText.style.display = 'none'; // 隐藏提示文字
-						}
-						reader.readAsDataURL(file); // 读取文件
-					}
-				});
-			
-				// 监听文件选择事件，显示预览图片
-				fileInput.addEventListener('change', (event) => {
-					const file = event.target.files[0];
-					if (file && file.type.startsWith('image/')) {
-						const reader = new FileReader();
-						reader.onload = function(e) {
-							preview.src = e.target.result;
-							preview.style.display = 'block';
-							uploadText.style.display = 'none';
-						}
-						reader.readAsDataURL(file);
-					}
-				});
-			
-				// 模拟上传，显示旋转加载图标，并在10秒后跳转
-				uploadButton.addEventListener('click', (event) => {
-					event.preventDefault(); // 阻止默认表单提交
-			
-					// 显示加载图标
-					loadingIcon.style.display = 'block';
-			
-					// 为页面容器添加模糊效果
-					container.classList.add('blur');
-			
-					// 模拟10秒后跳转
-					setTimeout(() => {
-						loadingIcon.style.display = 'none'; // 隐藏加载图标
-						container.classList.remove('blur'); // 移除模糊效果
-						window.location.href = "https://example.com"; // 跳转到目标页面
-					}, 10000); // 10秒等待
-				});
-			</script>
-			    <script>
-					document.addEventListener('DOMContentLoaded', function() {
-						const username = localStorage.getItem('username');
-						if (username) {
-							// 只更新 h1 标签中的用户名，而不是整个 body
-							document.getElementById('logo').innerHTML = `<a href="#">${username}</a>`;
-						}
-					});
-				</script>
+<!-- Scripts -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/jquery.scrollex.min.js"></script>
+<script src="assets/js/jquery.scrolly.min.js"></script>
+<script src="assets/js/browser.min.js"></script>
+<script src="assets/js/breakpoints.min.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+
+<script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview'); // 预览图片的元素
+    const uploadButton = document.getElementById('uploadButton');
+    const loadingIcon = document.getElementById('loading');
+    const uploadText = document.getElementById('upload-text'); // 提示文字的元素
+    const container = document.querySelector('#four'); // 选择你的页面内容容器
+
+    // 点击区域时触发文件选择
+    dropArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // 当文件拖进来时高亮显示区域
+    dropArea.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropArea.classList.add('hover');
+    });
+
+    // 当文件离开拖放区域时移除高亮
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('hover');
+    });
+
+    // 处理文件放入事件，显示预览图片
+    dropArea.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropArea.classList.remove('hover');
+        const file = event.dataTransfer.files[0]; // 获取第一个文件
+        fileInput.files = event.dataTransfer.files; // 将文件分配给 input
+
+        // 显示预览图片
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // 显示图片预览
+                uploadText.style.display = 'none'; // 隐藏提示文字
+            }
+            reader.readAsDataURL(file); // 读取文件
+        }
+    });
+
+    // 监听文件选择事件，显示预览图片
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                uploadText.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 上传功能扩展：存储图片和信息
+    uploadButton.addEventListener('click', (event) => {
+        event.preventDefault(); // 阻止默认表单提交
+
+        const file = fileInput.files[0];
+        const subject = document.getElementById('subjectInput').value;
+        const username = localStorage.getItem('username');
+
+        if (!file || !subject || !username) {
+            alert('请填写所有信息并选择图片');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('subject', subject);
+        formData.append('username', username);
+
+        // 显示加载图标
+        loadingIcon.style.display = 'block';
+        container.classList.add('blur');
+
+        // 发送上传请求
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  // 上传成功后显示图片并生成新的用户 garden_page.html
+                  const newArticle = document.createElement('article');
+                  newArticle.innerHTML = `
+                    <a href="garden_page.html?userId=${data.userId}" class="image"><img src="${data.imagePath}" alt="Garden Image" /></a>
+                    <div class="inner">
+                      <h4>${data.subject}</h4>
+                      <p>${username}</p>
+                    </div>
+                  `;
+                  document.querySelector('.features').appendChild(newArticle);
+
+                  // 隐藏加载图标
+                  loadingIcon.style.display = 'none';
+                  container.classList.remove('blur');
+              } else {
+                  alert('上传失败');
+              }
+          })
+          .catch(error => {
+              console.error('上传错误:', error);
+              loadingIcon.style.display = 'none';
+              container.classList.remove('blur');
+          });
+    });
+</script>
+
+<!-- 用户名显示逻辑 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = localStorage.getItem('username');
+        if (username) {
+            // 只更新 h1 标签中的用户名，而不是整个 body
+            document.getElementById('logo').innerHTML = `<a href="#">${username}</a>`;
+        }
+    });
+</script>
+
+
 	</body>
 </html>
