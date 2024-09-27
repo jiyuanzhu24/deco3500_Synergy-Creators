@@ -31,6 +31,35 @@
 			#search-button:hover {
 				background-color: #0056b3;
 			}
+			 /* 打字动画的样式 */
+			 .typewriter {
+        opacity: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 2px solid;
+        animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+
+    /* 打字动画效果 */
+    @keyframes typing {
+        from { 
+            width: 0;
+            opacity: 1;
+        }
+        to { 
+            width: 100%;
+        }
+    }
+
+    /* 光标闪烁效果 */
+    @keyframes blink-caret {
+        from, to { 
+            border-color: transparent; 
+        }
+        50% { 
+            border-color: black; 
+        }
+    }
 		</style>
 	</head>
 	<body class="is-preload">
@@ -99,7 +128,7 @@
 									allowfullscreen>
 								</iframe>
 									<button id="search-button">Search</button>
-									<ul class="feature-icons">
+									<ul class="feature-icons" id="feature-icons" style="display: none;">
 										
 										<li class="icon solid fa-cubes">Stack small boxes</li>
 										<li class="icon solid fa-book">Read books and stuff</li>
@@ -645,6 +674,8 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 							// 使用用户当前位置搜索“Garden Tools Store”
 							var searchSrc = `https://www.google.com/maps/embed/v1/search?key=AIzaSyCN9Hobh1ajz04ii8Im1nn5zij8hYzmfsw&q=Garden+Tools+Store&center=${userLat},${userLng}&zoom=10`;
 							document.getElementById('map-frame').src = searchSrc;
+							 // 显示隐藏的 UL 列表并应用打字动画
+							 document.getElementById('feature-icons').style.display = "block";
 						});
 					}
 				});
