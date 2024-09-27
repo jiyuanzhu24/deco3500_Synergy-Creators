@@ -264,6 +264,37 @@
               });
         }, 10000); // 10秒等待
     });
+
+	// 上传成功后显示图片并生成新的用户 garden_page.html
+if (data.success) {
+    window.location.href = `garden_page.html?userId=${data.userId}`;
+} else {
+    alert('上传失败');
+}
+
+// 上传成功后显示图片并生成新的用户 garden_page.html
+if (data.success) {
+    const newArticle = document.createElement('article');
+    newArticle.innerHTML = `
+      <a href="garden_page.html?userId=${data.userId}" class="image"><img src="${data.imagePath}" alt="Garden Image" /></a>
+      <div class="inner">
+        <h4>${data.subject}</h4>
+        <p>${username}</p>
+      </div>
+    `;
+    document.getElementById('uploaded-gardens').appendChild(newArticle);
+}
+
+
+	document.addEventListener('DOMContentLoaded', function() {
+        const username = localStorage.getItem('username');
+        if (username) {
+            // 更新 h1 标签中的用户名
+            document.getElementById('logo').innerHTML = `<a href="#">${username}</a>`;
+        } else {
+            window.location.href = "/login.html";  // 如果没有用户名，跳转到登录页面
+        }
+    });
 </script>
 
 
