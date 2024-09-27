@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');  // 添加这一行
 require('dotenv').config();
 
 const app = express();
@@ -13,6 +14,17 @@ app.use(express.static('public')); // 托管 public 文件夹中的静态文件
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('MongoDB connection error:', err));
+
+// 设置文件上传的配置
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');  // 上传目录（确保 Heroku 使用云存储代替本地）
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);  // 设置文件名
+    }
+});
+const upload = multer({ storage: storage });  // 定义 `upload`
 
 // 创建用户模型
 const userSchema = new mongoose.Schema({
@@ -49,63 +61,7 @@ app.post('/login', async (req, res) => {
     res.json({ success: true, username: user.username, token }); // 返回 token
 });
 
-// 监听端口
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');  // 假设你的 index.html 文件在 public 文件夹中
-});
-
-// 创建评论模型
-const commentSchema = new mongoose.Schema({
-    username: String,
-    comment: String,
-    timestamp: { type: Date, default: Date.now }
-});
-const Comment = mongoose.model('Comment', commentSchema);
-
-// 评论提交路由 (确保用户已经登录)
-app.post('/submit-comment', async (req, res) => {
-    const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-    
-    if (!token) {
-        return res.status(401).send('No token provided');
-    }
-
-    const { comment } = req.body;
-
-    // 验证用户 token
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
-
-        if (!user) {
-            return res.status(401).send('User not found');
-        }
-
-        // 创建并保存评论
-        const newComment = new Comment({
-            username: user.username,
-            comment
-        });
-        await newComment.save();
-
-        res.status(200).send('Comment submitted');
-    } catch (err) {
-        res.status(401).send('Invalid token');
-    }
-});
-
-// 获取所有评论的路由
-app.get('/comments', async (req, res) => {
-    const comments = await Comment.find().sort({ timestamp: -1 }); // 按时间倒序排列
-    res.json(comments);
-});
-
-
+// 上传花园图片路由
 app.post('/upload-garden', upload.single('garden_photo'), async (req, res) => {
     const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
     
@@ -207,7 +163,7 @@ app.post('/upload-garden', upload.single('garden_photo'), async (req, res) => {
           
             </body>
           </html>
-        `;  // 生成的 garden page HTML
+        `;
 
         const pagePath = `./public/pages/garden_page_${user._id}.html`;
 
@@ -223,4 +179,10 @@ app.post('/upload-garden', upload.single('garden_photo'), async (req, res) => {
     } catch (err) {
         res.status(401).send('Invalid token');
     }
+});
+
+// 监听端口
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
