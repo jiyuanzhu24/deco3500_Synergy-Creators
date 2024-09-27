@@ -11,6 +11,27 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		
+		<style>
+			/* 地图下方的按钮容器 */
+			#search-button {
+				display: block; /* 让按钮成为块级元素 */
+				margin: 30px auto; /* 设置上下间距并居中 */
+				padding: 10px 20px; /* 调整按钮内边距 */
+				font-size: 16px; /* 文字大小 */
+				color: #ffffff; /* 文字颜色 */
+				background-color: #4acaa8; /* 背景颜色 */
+				border: none; /* 去掉边框 */
+				border-radius: 5px; /* 圆角边框 */
+				cursor: pointer; /* 鼠标悬停时显示手型 */
+				transition: background-color 0.3s ease; /* 添加平滑过渡效果 */
+			}
+		
+			/* 鼠标悬停时改变按钮颜色 */
+			#search-button:hover {
+				background-color: #0056b3;
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
@@ -25,7 +46,7 @@
 				<nav id="nav">
 					<ul>
 						<li><a href="#one" class="active">About</a></li>
-						<li><a href="#two">Things I Can Do</a></li>
+						<li><a href="#two">Gardening map</a></li>
 
 						<li><a href="#three">Collaborative garden design</a></li>
 						<li><a href="#four">Generate your garden</a></li>
@@ -66,13 +87,23 @@
 						<!-- Two -->
 							<section id="two">
 								<div class="container">
-									<h3>Things I Can Do</h3>
-									<p>Integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia elementum integer lorem ipsum dolor sit amet.</p>
+									<h3>Gardening map</h3>
+									<p>Here, you can search for nearby gardening markets or places that sell gardening tools.</p>
+									<iframe 
+									id="map-frame" 
+									src="" 
+									width="100%" 
+									height="400" 
+									frameborder="0" 
+									style="border:0;" 
+									allowfullscreen>
+								</iframe>
+									<button id="search-button">Search</button>
 									<ul class="feature-icons">
-										<li class="icon solid fa-code">Write all the code</li>
+										
 										<li class="icon solid fa-cubes">Stack small boxes</li>
 										<li class="icon solid fa-book">Read books and stuff</li>
-										<li class="icon solid fa-coffee">Drink much coffee</li>
+										
 										<li class="icon solid fa-bolt">Lightning bolt</li>
 										<li class="icon solid fa-users">Shadow clone technique</li>
 									</ul>
@@ -583,5 +614,43 @@ print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
 						}
 					});
 				</script>
+			<script>
+				// 初始化地图为用户的当前位置
+				function initMap() {
+					if (navigator.geolocation) {
+						navigator.geolocation.getCurrentPosition(function(position) {
+							var userLat = position.coords.latitude;
+							var userLng = position.coords.longitude;
+							
+							// 将用户的当前位置作为地图的初始位置
+							var mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyCN9Hobh1ajz04ii8Im1nn5zij8hYzmfsw&q=${userLat},${userLng}`;
+							document.getElementById('map-frame').src = mapSrc;
+						}, function() {
+							console.error("Geolocation failed or permission denied.");
+							alert("Unable to retrieve your location.");
+						});
+					} else {
+						console.error("Geolocation is not supported by this browser.");
+						alert("Geolocation is not supported by this browser.");
+					}
+				}
+			
+				// 监听搜索按钮点击事件
+				document.getElementById('search-button').addEventListener('click', function() {
+					if (navigator.geolocation) {
+						navigator.geolocation.getCurrentPosition(function(position) {
+							var userLat = position.coords.latitude;
+							var userLng = position.coords.longitude;
+			
+							// 使用用户当前位置搜索“Garden Tools Store”
+							var searchSrc = `https://www.google.com/maps/embed/v1/search?key=AIzaSyCN9Hobh1ajz04ii8Im1nn5zij8hYzmfsw&q=Garden+Tools+Store&center=${userLat},${userLng}&zoom=10`;
+							document.getElementById('map-frame').src = searchSrc;
+						});
+					}
+				});
+			
+				// 页面加载时初始化地图
+				window.onload = initMap;
+			</script>
 	</body>
 </html>
