@@ -104,3 +104,123 @@ app.get('/comments', async (req, res) => {
     const comments = await Comment.find().sort({ timestamp: -1 }); // 按时间倒序排列
     res.json(comments);
 });
+
+
+app.post('/upload-garden', upload.single('garden_photo'), async (req, res) => {
+    const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
+    
+    if (!token) {
+        return res.status(401).send('No token provided');
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return res.status(401).send('User not found');
+        }
+
+        const imgPath = `/uploads/${req.file.filename}`;
+        const gardenPageContent = `
+        <!DOCTYPE HTML>
+        <html>
+          <head>
+            <title>Garden Photo</title>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+            <link rel="stylesheet" href="/main.css" />
+          </head>
+          <body class="is-preload">
+        
+            <!-- Header -->
+            <section id="header">
+              <header>
+                <span class="image avatar"><img src="images/avatar.jpg" alt="" /></span>
+                <h1 id="logo"><a href="#">${user.username}</a></h1>
+                <p>I got reprogrammed by a rogue AI<br /> and now I'm totally cray</p>
+              </header>
+              <nav id="nav">
+                <ul>
+                  <li><a href="#one" class="active">About</a></li>
+                  <li><a href="#two">Things I Can Do</a></li>
+                  <li><a href="#three">Collaborative garden design</a></li>
+                  <li><a href="#four">Generate your garden</a></li>
+                </ul>
+              </nav>
+              <footer>
+                <ul class="icons">
+                  <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+                  <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+                  <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+                  <li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+                  <li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+                </ul>
+              </footer>
+            </section>
+        
+            <!-- Wrapper -->
+            <div id="wrapper">
+              <!-- Main -->
+              <div id="main">
+                <!-- One -->
+                <section id="one">
+                  <div class="container">
+                    <header class="major">
+                      <h2>Garden Photo</h2>
+                      <p>Upload your garden photo and share your design.</p>
+                    </header>
+        
+                    <!-- 用户上传的花园照片 -->
+                    <div class="photo-display">
+                        <img src="${imgPath}" alt="User's Garden Photo" style="max-width: 100%; height: auto;" />
+                      </div>
+                    </div>
+                  </section>
+        
+        <!-- 评论区 -->
+        <section id="comments">
+            <div class="container">
+              <h3>Comments</h3>
+              <div class="comment-box">
+                <textarea id="commentText" placeholder="Write your comment here..."></textarea>
+                <button type="submit" class="button primary" onclick="submitComment()">Submit Comment</button>
+              </div>
+              <div class="existing-comments">
+                <h4>Previous Comments</h4>
+                <ul id="commentList">
+                  <!-- 评论列表将在这里动态加载 -->
+                </ul>
+              </div>
+            </div>
+          </section>
+              </div>
+            </div>
+            <!-- Footer -->
+            <section id="footer">
+                <div class="container">
+                  <ul class="copyright">
+                    <li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                  </ul>
+                </div>
+              </section>
+          
+            </body>
+          </html>
+        `;  // 生成的 garden page HTML
+
+        const pagePath = `./public/pages/garden_page_${user._id}.html`;
+
+        fs.writeFile(pagePath, gardenPageContent, (err) => {
+            if (err) {
+                console.error('Error generating page:', err);
+                return res.status(500).send('Error generating page.');
+            }
+
+            // 返回生成的页面 URL
+            res.json({ success: true, pageUrl: `/pages/garden_page_${user._id}.html` });
+        });
+    } catch (err) {
+        res.status(401).send('Invalid token');
+    }
+});
