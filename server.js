@@ -2,12 +2,34 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const compression = require('compression');  // 引入 compression 中间件
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public')); // 托管 public 文件夹中的静态文件
+
+// 启用 gzip 压缩
+app.use(compression());
+
+// 设置正确的 gzip 响应头处理 Unity WebGL 文件
+app.get('*.js', (req, res, next) => {
+  if (req.url.endsWith('.gz')) {
+    res.set('Content-Encoding', 'gzip');
+    res.set('Content-Type', 'application/javascript');
+  }
+  next();
+});
+
+app.get('*.wasm', (req, res, next) => {
+  if (req.url.endsWith('.gz')) {
+    res.set('Content-Encoding', 'gzip');
+    res.set('Content-Type', 'application/wasm');
+  }
+  next();
+});
 
 // 连接 MongoDB 数据库
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -55,8 +77,14 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
+// 主页路由
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');  // 假设你的 index.html 文件在 public 文件夹中
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));  // 假设你的 index.html 文件在 public 文件夹中
+});
+
+// Unity WebGL 游戏页面路由
+app.get('/unity-game', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'unity-game.html'));  // 指向你 Unity WebGL 重命名后的 html 文件
 });
 
 // 创建评论模型
