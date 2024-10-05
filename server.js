@@ -14,20 +14,22 @@ app.use(express.static('public')); // 托管 public 文件夹中的静态文件
 // 启用 gzip 压缩
 app.use(compression());
 
-// 设置正确的 gzip 响应头处理 Unity WebGL 文件
-app.get('*.js', (req, res, next) => {
-  if (req.url.endsWith('.gz')) {
-    res.set('Content-Encoding', 'gzip');
-    res.set('Content-Type', 'application/javascript');
-  }
+// 手动为 Unity WebGL 的 .gz 文件设置正确的 Content-Encoding 响应头
+app.get('*.js.gz', (req, res, next) => {
+  res.set('Content-Encoding', 'gzip');
+  res.set('Content-Type', 'application/javascript');
   next();
 });
 
-app.get('*.wasm', (req, res, next) => {
-  if (req.url.endsWith('.gz')) {
-    res.set('Content-Encoding', 'gzip');
-    res.set('Content-Type', 'application/wasm');
-  }
+app.get('*.wasm.gz', (req, res, next) => {
+  res.set('Content-Encoding', 'gzip');
+  res.set('Content-Type', 'application/wasm');
+  next();
+});
+
+app.get('*.data.gz', (req, res, next) => {
+  res.set('Content-Encoding', 'gzip');
+  res.set('Content-Type', 'application/octet-stream');
   next();
 });
 
