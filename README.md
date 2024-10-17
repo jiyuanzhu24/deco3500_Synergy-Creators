@@ -9,6 +9,21 @@ To view the source code, please follow these steps:
 
 If you don't see the branch dropdown, click **"View all branches"** and select `master` from the list.
 
+### Usage Instructions
+
+To use our website, you need to follow these steps:
+
+1. **Register an Account:**
+   - Navigate to the registration page and create a new account by providing the required information.
+   
+2. **Log in:**
+   - After successful registration, go to the login page and use your credentials to log in.
+   
+Once logged in, you will have full access to all the features of the website.
+
+**Note:** You must be logged in to use the website's functionalities.
+
+
 Project Overview
 Garden Craft is a web application designed to help users manage their gardens efficiently. Users can log in to upload images of their gardens and customize or redesign them using a variety of tools available on the platform. It offers weed control guidance, garden management tips, and community collaboration for garden redesigns.
 
